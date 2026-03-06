@@ -4,13 +4,13 @@ import java.time.Instant;
 
 public class ChecklistItem {
     private long id;
-    private long taskId;           // к какой задаче относится
+    private long taskId;          
     private String text;
     private boolean done;
     private Instant createdAt;
     private Instant updatedAt;
 
-    // Конструктор
+    
     public ChecklistItem(long taskId, String text) {
         this.taskId = taskId;
         this.text = text;
@@ -70,4 +70,5 @@ public class ChecklistItem {
     public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
     }
+
 }
