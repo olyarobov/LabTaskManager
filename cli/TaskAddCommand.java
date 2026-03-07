@@ -31,12 +31,12 @@ public class TaskAddCommand extends Command {
         }
 
         Task newTask = new Task(
-            text, 
-            priority, 
-            TaskStatus.NEW, 
-            null, 
-            Instant.now(), 
-            "STUDENT_ITMO"
+                text,      
+                priority,      
+                TaskStatus.NEW, 
+                null,          
+                null,           
+                "STUDENT_ITMO" 
         );
 
         taskService.addTask(newTask);
