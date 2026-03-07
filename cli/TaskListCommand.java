@@ -22,11 +22,20 @@ public class TaskListCommand extends Command {
 
         System.out.println("Список задач");
         for (Task task : tasks) {
-            System.out.printf("[%d] %s | Приоритет: %s | Статус: %s%n",
-                    task.getId(),
-                    task.getText(),
-                    task.getPriority(),
-                    task.getStatus());
+    System.out.printf("[%d] %s | Приоритет: %s | Статус: %s%n",
+            task.getId(),
+            task.getText(),
+            task.getPriority(),
+            task.getStatus());
+    
+    // Вывод подзадач (пунктов чек-листа)
+    List<ChecklistItem> items = task.getChecklistItems();
+    if (!items.isEmpty()) {
+        for (ChecklistItem item : items) {
+            String statusChar = item.isDone() ? "[x]" : "[ ]";
+            System.out.printf("    %s %d: %s%n", statusChar, item.getId(), item.getText());
         }
+    }
+}
     }
 }
