@@ -1,7 +1,7 @@
 package org.itmo.cli.commands;
 
-import org.itmo.cli.Command;
 import org.itmo.domain.Task;
+import org.itmo.domain.TaskPriority;
 import org.itmo.domain.TaskStatus;
 import org.itmo.service.TaskService;
 import java.util.Scanner;
@@ -9,44 +9,59 @@ import java.util.Scanner;
 public class TaskUpdateCommand extends Command {
 
     public TaskUpdateCommand(TaskService taskService) {
-        super(taskService, "task_update", "Обновить статус задачи по ID", 1);
+        super(taskService, "task_update", "Редактировать задачу (текст, приоритет, статус)", 1);
     }
 
     @Override
     public void execute(String[] args, Scanner scanner) {
-        Task task = null;
+        System.out.print("Введите ID задачи для редактирования: ");
+        String idInput = scanner.nextLine().trim();
+        long id;
+        try {
+            id = Long.parseLong(idInput);
+        } catch (NumberFormatException e) {
+            System.out.println("Ошибка: ID должен быть числом.");
+            return;
+        }
 
-        // Цикл для поиска задачи по ID
-        while (task == null) {
-            System.out.print("Введите ID задачи для обновления: ");
-            String idInput = scanner.nextLine().trim();
+        Task task = taskService.getTaskById(id);
+        if (task == null) {
+            System.out.println("Ошибка: Задача с таким ID не найдена.");
+            return;
+        }
+
+        System.out.println("Редактирование задачи #" + id + " (оставьте поле пустым, чтобы не менять)");
+
+        // 1. Редактируем текст
+        System.out.print("Новый текст [" + task.getText() + "]: ");
+        String newText = scanner.nextLine().trim();
+        if (!newText.isEmpty()) {
+            task.setText(newText);
+        }
+
+        // 2. Редактируем приоритет
+        System.out.print("Новый приоритет (LOW, MEDIUM, HIGH) [" + task.getPriority() + "]: ");
+        String priorityInput = scanner.nextLine().trim().toUpperCase();
+        if (!priorityInput.isEmpty()) {
             try {
-                long id = Long.parseLong(idInput);
-              
-                task = taskService.getTaskById(id);
-            } catch (NumberFormatException e) {
-                System.out.println("Ошибка: ID должен быть целым числом!");
+                task.setPriority(TaskPriority.valueOf(priorityInput));
             } catch (IllegalArgumentException e) {
-
-                System.out.println(e.getMessage());
+                System.out.println("Ошибка: Неверный приоритет. Оставлен прежний.");
             }
         }
 
-        // Цикл для ввода нового статуса
-        TaskStatus newStatus = null;
-        while (newStatus == null) {
-            System.out.print("Введите новый статус (NEW, IN_PROGRESS, DONE): ");
+        // 3. Редактируем статус
+        System.out.print("Новый статус (NEW, IN_PROGRESS, DONE) [" + task.getStatus() + "]: ");
+        String statusInput = scanner.nextLine().trim().toUpperCase();
+        if (!statusInput.isEmpty()) {
             try {
-                String statusInput = scanner.nextLine().trim().toUpperCase();
-                newStatus = TaskStatus.valueOf(statusInput);
+                task.setStatus(TaskStatus.valueOf(statusInput));
             } catch (IllegalArgumentException e) {
-                System.out.println("Ошибка: Неверный статус. Используйте: NEW, IN_PROGRESS или DONE.");
+                System.out.println("Ошибка: Неверный статус. Оставлен прежний.");
             }
         }
 
-        task.setStatus(newStatus);
-        taskService.updateTask(task.getId(), task);
-        
-        System.out.println("Статус задачи успешно обновлен!");
+        taskService.updateTask(id, task);
+        System.out.println("Задача успешно обновлена!");
     }
 }
